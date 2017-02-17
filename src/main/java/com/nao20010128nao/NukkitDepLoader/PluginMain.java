@@ -19,9 +19,11 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by nao on 2017/02/17.
@@ -80,10 +82,14 @@ public class PluginMain extends PluginBase {
             added.add(deps);
 
             getLogger().info("Resolving dependencies recursively...");
+            Set<Dependency> checked=new HashSet<>();
             while(!added.get(added.size()-1).isEmpty()){
                 Set<Dependency> newAdded=new HashSet<>();
                 Set<Dependency> previousAdded=added.get(added.size()-1);
                 previousAdded.forEach(d->{
+                    if(checked.contains(d)){
+                        return;
+                    }
                     d.foundAt.forEach(r->{
                         if(!r.checkFileExist(d.getRelativePathForPom())){
                             return;
@@ -97,6 +103,7 @@ public class PluginMain extends PluginBase {
                             getLogger().error("An error occurred while loading POM file",e);
                         }
                     });
+                    checked.add(d);
                 });
                 added.add(newAdded);
             }
@@ -153,17 +160,136 @@ public class PluginMain extends PluginBase {
     }
 
     public static void merge(Set<Dependency> deps,Dependency dep){
-        AtomicBoolean ok=new AtomicBoolean(false);
-        deps.forEach(d->{
+        boolean ok=false;
+        for(Dependency d:new HashSet<>(deps)){
             if(d.equals(dep)){
                 d.foundAt.addAll(dep.foundAt);
-                ok.set(true);
+                Dependency latestVersion=newerVersion(d,dep);
+                if(latestVersion!=null){
+                    deps.remove(d);
+                    latestVersion.foundAt.addAll(d.foundAt);
+                    deps.add(latestVersion);
+                }
+                ok=true;
             }
-        });
-        if(ok.get()){
+        }
+        if(ok){
             return;
         }
-        deps.add(dep);
+        deps.add(resolveVersion(dep));
+    }
+
+    public static Dependency newerVersion(Dependency a,Dependency b){
+        if(a==b){return a;}
+        if(!Objects.equals(a.group,b.group)){
+            return null;//cannot be compared: different group
+        }
+        if(!Objects.equals(a.artifact,b.artifact)){
+            return null;//cannot be compared: different artifact
+        }
+        if(!Objects.equals(a.classifier,b.classifier)){
+            return null;//cannot be compared: different classifier
+        }
+
+        String metaRelative = a.group + "/" + a.artifact;
+        metaRelative = metaRelative.replace('.', '/');
+        metaRelative += "/maven-metadata.xml";
+        byte[] data=null;
+        for(Repository r: Stream.concat(a.foundAt.stream(),b.foundAt.stream()).collect(Collectors.toSet())){
+            data = r.download(metaRelative);
+            if(data!=null)break;
+        }
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder documentBuilder = factory.newDocumentBuilder();
+            Document document = documentBuilder.parse(new ByteArrayInputStream(data));
+
+            List<Node> versioning = NodeListToArrayList(document.getDocumentElement().getElementsByTagName("versioning"));
+            if (!versioning.isEmpty()) {
+                List<Node> versions = NodeListToArrayList(((Element) versioning.get(0)).getElementsByTagName("versions"));
+                if (!versions.isEmpty()) {
+                    List<String> vers=new ArrayList<>(versions.stream().map(Node::getTextContent).collect(Collectors.toList()));
+                    Collections.reverse(vers);
+                    if(vers.indexOf(a.version)>vers.indexOf(b.version)){
+                        return a;
+                    }else{
+                        return b;
+                    }
+                }
+            }
+        } catch (Throwable e) {
+        }
+        if(a.version==null&b.version==null){
+            return a;//null version
+        }
+        if(a.version!=null){
+            return a;//use a instead
+        }else{
+            return b;//use b instead
+        }
+    }
+
+    public static Dependency resolveVersion(Dependency in){
+        if(in.version==null||"null".equals(in.version)||in.version.isEmpty()||in.version.equals("RELEASE")) {
+            // require release version
+            String metaRelative = in.group + "/" + in.artifact;
+            metaRelative = metaRelative.replace('.', '/');
+            metaRelative += "/maven-metadata.xml";
+            byte[] data=null;
+            for(Repository r:in.foundAt){
+                data = r.download(metaRelative);
+                if(data!=null)break;
+            }
+            try {
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder documentBuilder = factory.newDocumentBuilder();
+                Document document = documentBuilder.parse(new ByteArrayInputStream(data));
+
+                List<Node> versioning = NodeListToArrayList(document.getDocumentElement().getElementsByTagName("versioning"));
+                if (!versioning.isEmpty()) {
+                    List<Node> release = NodeListToArrayList(((Element) versioning.get(0)).getElementsByTagName("release"));
+                    if (!release.isEmpty()) {
+                        return new Dependency(in.group, in.artifact, release.get(0).getTextContent(), in.classifier,in.foundAt);
+                    }
+                }
+            } catch (Throwable e) {
+                return in;
+            }
+        }else if(in.version.equals("LATEST")){
+            String metaRelative = in.group + "/" + in.artifact;
+            metaRelative = metaRelative.replace('.', '/');
+            metaRelative += "/maven-metadata.xml";
+            byte[] data=null;
+            for(Repository r:in.foundAt){
+                data = r.download(metaRelative);
+                if(data!=null)break;
+            }
+            try {
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder documentBuilder = factory.newDocumentBuilder();
+                Document document = documentBuilder.parse(new ByteArrayInputStream(data));
+
+                List<Node> versioning = NodeListToArrayList(document.getDocumentElement().getElementsByTagName("versioning"));
+                if (!versioning.isEmpty()) {
+                    List<Node> latest = NodeListToArrayList(((Element) versioning.get(0)).getElementsByTagName("release"));
+                    if (!latest.isEmpty()) {
+                        return new Dependency(in.group, in.artifact, latest.get(0).getTextContent(), in.classifier,in.foundAt);
+                    }
+                }
+            } catch (Throwable e) {
+                return in;
+            }
+        }else if(in.version.matches("^\\[^[,]+\\]$")){
+            Pattern regex=Pattern.compile("^\\[(^[,]+)\\]$");
+            Matcher matcher=regex.matcher(in.version);
+            if(matcher.find()){
+                return new Dependency(in.group, in.artifact, matcher.group(), in.classifier,in.foundAt);
+            }
+        }else if((in.version.startsWith("(")|in.version.startsWith("["))|(in.version.endsWith(")")|in.version.endsWith("]"))){
+            // I dont know how
+            return resolveVersion(new Dependency(in.group, in.artifact, "LATEST", in.classifier,in.foundAt));
+        }
+        return in;
     }
 
     public static Set<Dependency> pomToDeps(byte[] in,Repository r,Set<Repository> repos)throws Throwable{
@@ -190,18 +316,22 @@ public class PluginMain extends PluginBase {
             Node dependencies=depNodeList.item(0);
             ArrayList<Node> depNodes=NodeListToArrayList(dependencies.getChildNodes());
             depNodes.forEach(depNode->{
-                if (depNode.getNodeName().equals("dependency")) {
-                    Dependency dep=new Dependency(
-                            NodeListToArrayList(depNode.getChildNodes())
-                                    .stream()
-                                    .collect(
-                                            (Supplier<HashMap<String, String>>) HashMap::new,
-                                            (a,b)->a.put(b.getNodeName(), b.getTextContent()),
-                                            HashMap::putAll
-                                    )
-                    );
-                    dep.foundAt.add(r);
-                    merge(result,dep);
+                try {
+                    if (depNode.getNodeName().equals("dependency")) {
+                        Dependency dep=new Dependency(
+                                NodeListToArrayList(depNode.getChildNodes())
+                                        .stream()
+                                        .collect(
+                                                (Supplier<HashMap<String, String>>) HashMap::new,
+                                                (a,b)->a.put(b.getNodeName(), b.getTextContent()),
+                                                HashMap::putAll
+                                        )
+                        );
+                        dep=resolveVersion(dep);
+                        dep.foundAt.add(r);
+                        merge(result,dep);
+                    }
+                } catch (Exception e) {
                 }
             });
         }
@@ -236,10 +366,32 @@ public class PluginMain extends PluginBase {
         }
 
         public Dependency(Map<String,String> tags){
+            if("test".equals(tags.get("scope"))){
+                throw new RuntimeException("\"test\" scope dependency is not accepted");
+            }
+            if("provided".equals(tags.get("scope"))){
+                throw new RuntimeException("\"provided\" scope dependency is not accepted");
+            }
+            if("system".equals(tags.get("scope"))){
+                throw new RuntimeException("\"system\" scope dependency is not accepted");
+            }
+            if("import".equals(tags.get("import"))){
+                throw new RuntimeException("\"system\" scope dependency is not accepted");
+            }
             this.group=tags.get("groupId");
             this.artifact=tags.get("artifactId");
             this.version=tags.get("version");
             this.classifier=null;
+        }
+
+        public Dependency(String group,String artifact,String version,String classifier,Set<Repository> foundAt){
+            this.group=group;
+            this.artifact=artifact;
+            this.version=version;
+            this.classifier=classifier;
+            if(foundAt!=null){
+                this.foundAt.addAll(foundAt);
+            }
         }
 
         public String getRelativePathForJar(){
@@ -272,13 +424,12 @@ public class PluginMain extends PluginBase {
 
         @Override
         public boolean equals(Object obj) {
-            if(obj instanceof Dependency){
-                return Objects.equals(group,((Dependency) obj).group)&&
-                        Objects.equals(artifact,((Dependency) obj).artifact)&&
-                        Objects.equals(version,((Dependency) obj).version)&&
-                        Objects.equals(classifier,((Dependency) obj).classifier);
-            }
-            return false;
+            return obj instanceof Dependency &&
+                    Objects.equals(group, ((Dependency) obj).group) &&
+                    Objects.equals(artifact, ((Dependency) obj).artifact) &&
+                    ((Objects.equals(version, null) | Objects.equals(((Dependency) obj).version, null)) ||
+                            Objects.equals(version, ((Dependency) obj).version)) &&
+                    Objects.equals(classifier, ((Dependency) obj).classifier);
         }
     }
 
