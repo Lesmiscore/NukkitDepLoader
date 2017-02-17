@@ -1,0 +1,9 @@
+name: NukkitDepLoader
+main: com.nao20010128nao.NukkitDepLoader.PluginMain
+version: "1.0.0"
+api: [1.0.0]
+load: STARTUP
+author: nao20010128nao
+authors: [nao20010128nao]
+description: A plugin to load dependencies of other plugins
+website: http://localhost/
