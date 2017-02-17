@@ -1,6 +1,7 @@
 package com.nao20010128nao.NukkitDepLoader;
 
 import cn.nukkit.Server;
+import cn.nukkit.plugin.JavaPluginLoader;
 import cn.nukkit.plugin.PluginBase;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -14,9 +15,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLClassLoader;
+import java.net.*;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.function.Supplier;
@@ -30,8 +29,8 @@ import java.util.stream.Stream;
  */
 public class PluginMain extends PluginBase {
     @Override
-    public void onEnable() {
-        ClassLoader system=Server.class.getClassLoader();
+    public void onLoad() {
+        ClassLoader system=JavaPluginLoader.class.getClassLoader();
         if(!(system instanceof URLClassLoader)){
             getLogger().error("Unsupported ClassLoader detected.");
             return;
@@ -108,8 +107,32 @@ public class PluginMain extends PluginBase {
                 added.add(newAdded);
             }
 
-            getLogger().info("Downloading artifacts...");
+            getLogger().info("Removing duplicated dependencies...");
             added.stream().skip(1).forEach(s->merge(deps,s));
+            Map<Dependency,String> depMap=new HashMap<>();
+            deps.forEach(d->{
+                Dependency noVer=new Dependency(d.group,d.artifact,null,d.classifier,d.foundAt);
+                getLogger().info("Check: "+noVer);
+                if(depMap.containsKey(noVer)){
+                    getLogger().info("Merge: "+noVer);
+                    depMap.put(noVer,newerVersion(noVer,d.version,depMap.get(noVer)));
+                }else{
+                    getLogger().info("Add: "+noVer);
+                    if(d.version!=null)depMap.put(noVer,d.version);
+                }
+            });
+            deps.clear();
+            deps.addAll(depMap.entrySet().stream().map(a->
+                            new Dependency(
+                                    a.getKey().group,
+                                    a.getKey().artifact,
+                                    a.getValue(),
+                                    a.getKey().classifier,
+                                    a.getKey().foundAt
+                            )
+                    ).collect(Collectors.toSet()));
+
+            getLogger().info("Downloading artifacts...");
             Set<File> using=new HashSet<>();
             File dirToDownload=new File(getDataFolder(),"maven");
             dirToDownload.mkdirs();
@@ -145,6 +168,7 @@ public class PluginMain extends PluginBase {
                 try {
                     addClasspath(system,f.toURI().toURL());
                 } catch (Throwable e) {
+                    e.printStackTrace();
                 }
             });
         }else{
@@ -228,6 +252,51 @@ public class PluginMain extends PluginBase {
             return b;//use b instead
         }
     }
+
+    public static String newerVersion(Dependency others,String a,String b){
+        if(Objects.equals(a,b)&a!=null){return a;}
+        if(a!=null&b==null){
+            return a;
+        }
+        if(a==null&b!=null){
+            return b;
+        }
+        if(a==null&b==null){
+            return null;//null version
+        }
+
+
+        String metaRelative = others.group + "/" + others.artifact;
+        metaRelative = metaRelative.replace('.', '/');
+        metaRelative += "/maven-metadata.xml";
+        byte[] data=null;
+        for(Repository r: others.foundAt.stream().collect(Collectors.toSet())){
+            data = r.download(metaRelative);
+            if(data!=null)break;
+        }
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder documentBuilder = factory.newDocumentBuilder();
+            Document document = documentBuilder.parse(new ByteArrayInputStream(data));
+
+            List<Node> versioning = NodeListToArrayList(document.getDocumentElement().getElementsByTagName("versioning"));
+            if (!versioning.isEmpty()) {
+                List<Node> versions = NodeListToArrayList(((Element) versioning.get(0)).getElementsByTagName("versions"));
+                if (!versions.isEmpty()) {
+                    List<String> vers=new ArrayList<>(versions.stream().map(Node::getTextContent).collect(Collectors.toList()));
+                    Collections.reverse(vers);
+                    if(vers.indexOf(a)>vers.indexOf(b)){
+                        return a;
+                    }else{
+                        return b;
+                    }
+                }
+            }
+        } catch (Throwable e) {
+        }
+        return null;
+    }
+
 
     public static Dependency resolveVersion(Dependency in){
         if(in.version==null||"null".equals(in.version)||in.version.isEmpty()||in.version.equals("RELEASE")) {
@@ -482,7 +551,7 @@ public class PluginMain extends PluginBase {
     }
 
     static void addClasspath(ClassLoader loader,URL url) throws Throwable{
-        Method addURL=loader.getClass().getDeclaredMethod("addURL",URL.class);
+        Method addURL=URLClassLoader.class.getDeclaredMethod("addURL",URL.class);
         addURL.setAccessible(true);
         addURL.invoke(loader,url);
     }
