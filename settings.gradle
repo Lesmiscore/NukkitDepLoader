@@ -1,2 +1,4 @@
 rootProject.name = 'NukkitDepLoader'
-
+include 'nukkit','bukkit'
+findProject(':nukkit')?.name = 'Nukkit'
+findProject(':bukkit')?.name = 'Bukkit'
