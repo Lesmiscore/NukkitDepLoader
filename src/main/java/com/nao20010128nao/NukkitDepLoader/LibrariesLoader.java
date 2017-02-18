@@ -1,8 +1,5 @@
 package com.nao20010128nao.NukkitDepLoader;
 
-import cn.nukkit.Server;
-import cn.nukkit.plugin.JavaPluginLoader;
-import cn.nukkit.plugin.PluginBase;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -15,7 +12,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.net.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.function.Supplier;
@@ -27,25 +26,24 @@ import java.util.stream.Stream;
 /**
  * Created by nao on 2017/02/17.
  */
-public class PluginMain extends PluginBase {
-    @Override
-    public void onLoad() {
-        ClassLoader system=JavaPluginLoader.class.getClassLoader();
+public class LibrariesLoader {
+    public static void doLoad(Plug plug){
+        ClassLoader system=plug.getPlugClassLoader();
         if(!(system instanceof URLClassLoader)){
-            getLogger().error("Unsupported ClassLoader detected.");
+            plug.getPlugLogger().error("Unsupported ClassLoader detected.");
             return;
         }
         try {
-            getLogger().info("Loading jar/zips inside libs...");
-            new File(getServer().getFilePath(),"libs").mkdirs();
-            for (File f:new File(getServer().getFilePath(),"libs").listFiles()){
+            plug.getPlugLogger().info("Loading jar/zips inside libs...");
+            new File(plug.getFilePath(),"libs").mkdirs();
+            for (File f:new File(plug.getFilePath(),"libs").listFiles()){
                 addClasspath(system,f.toURI().toURL());
             }
         } catch (Throwable e) {
-            getLogger().error("An error occurred while loading",e);
+            plug.getPlugLogger().error("An error occurred while loading",e);
         }
-        getLogger().info("Checking Maven...");
-        File mavenList=new File(getServer().getFilePath(),"maven.list");
+        plug.getPlugLogger().info("Checking Maven...");
+        File mavenList=new File(plug.getFilePath(),"maven.list");
         if(mavenList.exists()){
             Set<Dependency> deps=new HashSet<>();
             Set<Repository> repos=new HashSet<>();
@@ -63,10 +61,10 @@ public class PluginMain extends PluginBase {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            getLogger().info("Resolving dependencies...");
+            plug.getPlugLogger().info("Resolving dependencies...");
             deps.forEach(d->{
                 repos.forEach(r->{
-                    getLogger().info("Resolving "+d+" at "+r);
+                    plug.getPlugLogger().info("Resolving "+d+" at "+r);
                     if(r.checkFileExist(d.getRelativePathForPom())){
                         d.foundAt.add(r);
                     }else if(r.checkFileExist(d.getRelativePathForJar())){
@@ -80,7 +78,7 @@ public class PluginMain extends PluginBase {
             List<Set<Dependency>> added=new ArrayList<>();
             added.add(deps);
 
-            getLogger().info("Resolving dependencies recursively...");
+            plug.getPlugLogger().info("Resolving dependencies recursively...");
             Set<Dependency> checked=new HashSet<>();
             while(!added.get(added.size()-1).isEmpty()){
                 Set<Dependency> newAdded=new HashSet<>();
@@ -93,13 +91,13 @@ public class PluginMain extends PluginBase {
                         if(!r.checkFileExist(d.getRelativePathForPom())){
                             return;
                         }
-                        getLogger().info("Loading POM for "+d+" at "+r);
+                        plug.getPlugLogger().info("Loading POM for "+d+" at "+r);
                         try {
                             byte[] data=r.download(d.getRelativePathForPom());
                             if(data==null)return;
                             merge(newAdded,pomToDeps(data,r,repos));
                         } catch (Throwable e) {
-                            getLogger().error("An error occurred while loading POM file",e);
+                            plug.getPlugLogger().error("An error occurred while loading POM file",e);
                         }
                     });
                     checked.add(d);
@@ -107,17 +105,17 @@ public class PluginMain extends PluginBase {
                 added.add(newAdded);
             }
 
-            getLogger().info("Removing duplicated dependencies...");
+            plug.getPlugLogger().info("Removing duplicated dependencies...");
             added.stream().skip(1).forEach(s->merge(deps,s));
             Map<Dependency,String> depMap=new HashMap<>();
             deps.forEach(d->{
                 Dependency noVer=new Dependency(d.group,d.artifact,null,d.classifier,d.foundAt);
-                getLogger().info("Check: "+noVer);
+                plug.getPlugLogger().info("Check: "+noVer);
                 if(depMap.containsKey(noVer)){
-                    getLogger().info("Merge: "+noVer);
+                    plug.getPlugLogger().info("Merge: "+noVer);
                     depMap.put(noVer,newerVersion(noVer,d.version,depMap.get(noVer)));
                 }else{
-                    getLogger().info("Add: "+noVer);
+                    plug.getPlugLogger().info("Add: "+noVer);
                     if(d.version!=null)depMap.put(noVer,d.version);
                 }
             });
@@ -132,13 +130,13 @@ public class PluginMain extends PluginBase {
                             )
                     ).collect(Collectors.toSet()));
 
-            getLogger().info("Downloading artifacts...");
+            plug.getPlugLogger().info("Downloading artifacts...");
             Set<File> using=new HashSet<>();
-            File dirToDownload=new File(getDataFolder(),"maven");
+            File dirToDownload=new File(plug.getDataFolder(),"maven");
             dirToDownload.mkdirs();
 
             deps.forEach(d->{
-                getLogger().info("Download: "+d);
+                plug.getPlugLogger().info("Download: "+d);
                 List<Repository> downloadFrom=new ArrayList<>();
                 d.foundAt.forEach(r->{
                     if(r.checkFileExist(d.getRelativePathForJar())){
@@ -146,7 +144,7 @@ public class PluginMain extends PluginBase {
                     }
                 });
                 if(downloadFrom.isEmpty()){
-                    getLogger().error("Failed: "+d+" : No repository has artifact for it");
+                    plug.getPlugLogger().error("Failed: "+d+" : No repository has artifact for it");
                     return;
                 }
 
@@ -158,11 +156,11 @@ public class PluginMain extends PluginBase {
                         using.add(dest);
                         break;
                     } catch (IOException e) {
-                        getLogger().error("Failed: "+d,e);
+                        plug.getPlugLogger().error("Failed: "+d,e);
                     }
                 }
             });
-            getLogger().info("Loading jars...");
+            plug.getPlugLogger().info("Loading jars...");
             using.forEach(f->{
                 f.deleteOnExit();
                 try {

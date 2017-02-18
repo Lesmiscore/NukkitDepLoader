@@ -10,7 +10,34 @@ repositories {
     maven {url "http://ci.mengcraft.com:8080/job/Nukkit/lastSuccessfulBuild/maven-repository/repository"}
 }
 
+configurations{
+    nukkit.extendsFrom compile
+    bukkit.extendsFrom compile
+}
+
+sourceSets{
+    nukkit{
+        java{
+            srcDirs "src/nukkit/java","src/main/java"
+        }
+        resources{
+            srcDir "src/nukkit/resources"
+        }
+    }
+    bukkit{
+        java{
+            srcDirs "src/bukkit/java", "src/main/java"
+        }
+        resources{
+            srcDir "src/bukkit/resources"
+        }
+    }
+}
+
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
-    compile 'cn.nukkit:nukkit:1.0-SNAPSHOT'
+    nukkitCompile 'cn.nukkit:nukkit:1.0-SNAPSHOT'
+    // Please get it from BuildTools.jar or your CraftBukkit/Spigot installation!
+    // This plugin uses CraftBukkit for 1.11.2.
+    bukkitCompile files("libs/bukkit.jar")
 }

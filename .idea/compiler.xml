@@ -2,7 +2,9 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel>
+      <module name="NukkitDepLoader_bukkit" target="1.8" />
       <module name="NukkitDepLoader_main" target="1.8" />
+      <module name="NukkitDepLoader_nukkit" target="1.8" />
       <module name="NukkitDepLoader_test" target="1.8" />
     </bytecodeTargetLevel>
   </component>
