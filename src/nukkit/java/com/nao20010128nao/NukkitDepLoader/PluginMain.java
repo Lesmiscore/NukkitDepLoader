@@ -20,7 +20,7 @@ public class PluginMain extends PluginBase implements Plug,Plug.Logger{
     }
 
     @Override
-    public ClassLoader getClassLoader() {
+    public ClassLoader getPlugClassLoader() {
         return JavaPluginLoader.class.getClassLoader();
     }
 
