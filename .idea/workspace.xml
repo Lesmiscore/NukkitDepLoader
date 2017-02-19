@@ -56,24 +56,12 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="LibrariesLoader.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="LibrariesLoader.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/nao20010128nao/NukkitDepLoader/LibrariesLoader.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="150" column="41" lean-forward="false" selection-start-line="150" selection-start-column="41" selection-end-line="150" selection-end-column="41" />
-              <folding>
-                <element signature="imports" expanded="false" />
-                <element signature="e#7404#7405#0" expanded="false" />
-                <element signature="e#7445#7446#0" expanded="false" />
-                <element signature="e#20228#20229#0" expanded="false" />
-                <element signature="e#20323#20324#0" expanded="false" />
-                <element signature="e#20377#20378#0" expanded="false" />
-                <element signature="e#20458#20459#0" expanded="false" />
-                <element signature="e#22388#22389#0" expanded="false" />
-                <element signature="e#22434#22435#0" expanded="false" />
-                <element signature="e#22488#22489#0" expanded="false" />
-                <element signature="e#22523#22524#0" expanded="false" />
-              </folding>
+            <state relative-caret-position="238">
+              <caret line="445" column="52" lean-forward="false" selection-start-line="445" selection-start-column="52" selection-end-line="445" selection-end-column="52" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -118,7 +106,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="settings.gradle" pinned="false" current-in-tab="true">
+      <file leaf-file-name="settings.gradle" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/settings.gradle">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="68">
@@ -793,13 +781,13 @@
         <option value="$PROJECT_DIR$/src/bukkit/resources/plugin.yml" />
         <option value="$PROJECT_DIR$/src/main/java/com/nao20010128nao/NukkitDepLoader/Plug.java" />
         <option value="$PROJECT_DIR$/.gitignore" />
-        <option value="$PROJECT_DIR$/src/main/java/com/nao20010128nao/NukkitDepLoader/LibrariesLoader.java" />
         <option value="$PROJECT_DIR$/src/bukkit/java/com/nao20010128nao/NukkitDepLoader/PluginMain.java" />
         <option value="$PROJECT_DIR$/src/nukkit/java/com/nao20010128nao/NukkitDepLoader/PluginMain.java" />
         <option value="$PROJECT_DIR$/build.gradle" />
         <option value="$PROJECT_DIR$/settings.gradle" />
         <option value="$PROJECT_DIR$/nukkit/build.gradle" />
         <option value="$PROJECT_DIR$/bukkit/build.gradle" />
+        <option value="$PROJECT_DIR$/src/main/java/com/nao20010128nao/NukkitDepLoader/LibrariesLoader.java" />
       </list>
     </option>
   </component>
@@ -1317,19 +1305,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2550">
           <caret line="150" column="41" lean-forward="false" selection-start-line="150" selection-start-column="41" selection-end-line="150" selection-end-column="41" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#7404#7405#0" expanded="false" />
-            <element signature="e#7445#7446#0" expanded="false" />
-            <element signature="e#20228#20229#0" expanded="false" />
-            <element signature="e#20323#20324#0" expanded="false" />
-            <element signature="e#20377#20378#0" expanded="false" />
-            <element signature="e#20458#20459#0" expanded="false" />
-            <element signature="e#22388#22389#0" expanded="false" />
-            <element signature="e#22434#22435#0" expanded="false" />
-            <element signature="e#22488#22489#0" expanded="false" />
-            <element signature="e#22523#22524#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1406,19 +1382,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#7404#7405#0" expanded="false" />
-            <element signature="e#7445#7446#0" expanded="false" />
-            <element signature="e#20228#20229#0" expanded="false" />
-            <element signature="e#20323#20324#0" expanded="false" />
-            <element signature="e#20377#20378#0" expanded="false" />
-            <element signature="e#20458#20459#0" expanded="false" />
-            <element signature="e#22388#22389#0" expanded="false" />
-            <element signature="e#22434#22435#0" expanded="false" />
-            <element signature="e#22488#22489#0" expanded="false" />
-            <element signature="e#22523#22524#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1633,26 +1597,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/nao20010128nao/NukkitDepLoader/LibrariesLoader.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="150" column="41" lean-forward="false" selection-start-line="150" selection-start-column="41" selection-end-line="150" selection-end-column="41" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#7404#7405#0" expanded="false" />
-            <element signature="e#7445#7446#0" expanded="false" />
-            <element signature="e#20228#20229#0" expanded="false" />
-            <element signature="e#20323#20324#0" expanded="false" />
-            <element signature="e#20377#20378#0" expanded="false" />
-            <element signature="e#20458#20459#0" expanded="false" />
-            <element signature="e#22388#22389#0" expanded="false" />
-            <element signature="e#22434#22435#0" expanded="false" />
-            <element signature="e#22488#22489#0" expanded="false" />
-            <element signature="e#22523#22524#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://C:/Program Files/Java/jdk1.8.0_102/src.zip!/java/util/UUID.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="17">
@@ -1704,6 +1648,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="68">
           <caret line="4" column="0" lean-forward="true" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/nao20010128nao/NukkitDepLoader/LibrariesLoader.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="445" column="52" lean-forward="false" selection-start-line="445" selection-start-column="52" selection-end-line="445" selection-end-column="52" />
           <folding />
         </state>
       </provider>

@@ -442,8 +442,8 @@ public class LibrariesLoader {
             if("system".equals(tags.get("scope"))){
                 throw new RuntimeException("\"system\" scope dependency is not accepted");
             }
-            if("import".equals(tags.get("import"))){
-                throw new RuntimeException("\"system\" scope dependency is not accepted");
+            if("import".equals(tags.get("scope"))){
+                throw new RuntimeException("\"import\" scope dependency is not accepted");
             }
             this.group=tags.get("groupId");
             this.artifact=tags.get("artifactId");
