@@ -4,6 +4,10 @@
     <bytecodeTargetLevel>
       <module name="Bukkit_main" target="1.8" />
       <module name="Bukkit_test" target="1.8" />
+      <module name="BukkitDepLoader_main" target="1.8" />
+      <module name="BukkitDepLoader_test" target="1.8" />
+      <module name="DepLoader_main" target="1.8" />
+      <module name="DepLoader_test" target="1.8" />
       <module name="Nukkit_main" target="1.8" />
       <module name="Nukkit_test" target="1.8" />
       <module name="NukkitDepLoader_bukkit" target="1.8" />

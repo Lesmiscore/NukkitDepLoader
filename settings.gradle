@@ -1,4 +1,4 @@
-rootProject.name = 'NukkitDepLoader'
+rootProject.name = 'DepLoader'
 include 'nukkit','bukkit'
-findProject(':nukkit')?.name = 'Nukkit'
-findProject(':bukkit')?.name = 'Bukkit'
+findProject(':nukkit')?.name = "Nukkit$rootProject.name"
+findProject(':bukkit')?.name = "Bukkit$rootProject.name"

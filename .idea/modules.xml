@@ -2,17 +2,15 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/bukkit/Bukkit.iml" filepath="$PROJECT_DIR$/.idea/modules/bukkit/Bukkit.iml" group="Bukkit" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/bukkit/Bukkit_main.iml" filepath="$PROJECT_DIR$/.idea/modules/bukkit/Bukkit_main.iml" group="Bukkit" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/bukkit/Bukkit_test.iml" filepath="$PROJECT_DIR$/.idea/modules/bukkit/Bukkit_test.iml" group="Bukkit" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/nukkit/Nukkit.iml" filepath="$PROJECT_DIR$/.idea/modules/nukkit/Nukkit.iml" group="Nukkit" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/NukkitDepLoader.iml" filepath="$PROJECT_DIR$/.idea/modules/NukkitDepLoader.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/NukkitDepLoader_bukkit.iml" filepath="$PROJECT_DIR$/.idea/modules/NukkitDepLoader_bukkit.iml" group="NukkitDepLoader" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/NukkitDepLoader_main.iml" filepath="$PROJECT_DIR$/.idea/modules/NukkitDepLoader_main.iml" group="NukkitDepLoader" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/NukkitDepLoader_nukkit.iml" filepath="$PROJECT_DIR$/.idea/modules/NukkitDepLoader_nukkit.iml" group="NukkitDepLoader" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/NukkitDepLoader_test.iml" filepath="$PROJECT_DIR$/.idea/modules/NukkitDepLoader_test.iml" group="NukkitDepLoader" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/nukkit/Nukkit_main.iml" filepath="$PROJECT_DIR$/.idea/modules/nukkit/Nukkit_main.iml" group="Nukkit" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/nukkit/Nukkit_test.iml" filepath="$PROJECT_DIR$/.idea/modules/nukkit/Nukkit_test.iml" group="Nukkit" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/bukkit/BukkitDepLoader.iml" filepath="$PROJECT_DIR$/.idea/modules/bukkit/BukkitDepLoader.iml" group="BukkitDepLoader" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/bukkit/BukkitDepLoader_main.iml" filepath="$PROJECT_DIR$/.idea/modules/bukkit/BukkitDepLoader_main.iml" group="BukkitDepLoader" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/bukkit/BukkitDepLoader_test.iml" filepath="$PROJECT_DIR$/.idea/modules/bukkit/BukkitDepLoader_test.iml" group="BukkitDepLoader" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/DepLoader.iml" filepath="$PROJECT_DIR$/.idea/modules/DepLoader.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/DepLoader_main.iml" filepath="$PROJECT_DIR$/.idea/modules/DepLoader_main.iml" group="DepLoader" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/DepLoader_test.iml" filepath="$PROJECT_DIR$/.idea/modules/DepLoader_test.iml" group="DepLoader" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/nukkit/NukkitDepLoader.iml" filepath="$PROJECT_DIR$/.idea/modules/nukkit/NukkitDepLoader.iml" group="NukkitDepLoader" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/nukkit/NukkitDepLoader_main.iml" filepath="$PROJECT_DIR$/.idea/modules/nukkit/NukkitDepLoader_main.iml" group="NukkitDepLoader" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/nukkit/NukkitDepLoader_test.iml" filepath="$PROJECT_DIR$/.idea/modules/nukkit/NukkitDepLoader_test.iml" group="NukkitDepLoader" />
     </modules>
   </component>
 </project>
